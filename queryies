@@ -1,0 +1,3 @@
+SELECT AVG(Rating), PlatformName FROM vw_GameLibrary
+GROUP BY PlatformName 
+
