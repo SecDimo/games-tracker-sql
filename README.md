@@ -70,11 +70,12 @@ WHERE o.OwnedID IS NULL;
  
 ## What I Learned
  
-- **Design changes:** I started with a separate Developers table, then simplified it into a column on Games. The original design is kept as a comment in `games_tracker.sql`.
-- **Small typos, big effects:** a typo in my view (`0.Rating` instead of `o.Rating`) made every rating show as 0. I fixed it with `CREATE OR ALTER VIEW`.
-- **Grouping by the right column:** grouping by Title merged *God of War* (2005) and *God of War* (2018) into one row. Grouping by GameID fixed it.
-- **The query can be right while the data is wrong:** my wishlist query showed a game I own, because I'd never added an OwnedGames row for it. The fix was the data, not the SQL.
-- **INNER vs LEFT JOIN:** the view uses inner joins, so it hides games I don't own. Finding those needed a LEFT JOIN on the base tables.
+- **Designing tables that relate to each other:** splitting data into separate tables and connecting them with primary and foreign keys, instead of keeping everything in one big table.
+- **Protecting data quality at the database level:** using `NOT NULL` and `CHECK` constraints so bad values can't get in, no matter who's entering the data.
+- **Joins:** combining tables with `INNER JOIN`, and using `LEFT JOIN` to find what's *missing*, like games with no owned copy.
+- **Summarizing data:** `GROUP BY` with `COUNT`, `AVG`, `MIN` and `MAX`, and the difference between filtering rows with `WHERE` and filtering groups with `HAVING`.
+- **Views vs stored procedures:** a view is a saved query for reading data, while a stored procedure is saved logic that takes inputs and can change data, the way an app would call it.
+- **Working in the cloud:** setting up and connecting to an Azure SQL database, including firewall rules and authentication.
 ## Next Steps
  
 - Switch IDs to `IDENTITY` so the database numbers new rows automatically
