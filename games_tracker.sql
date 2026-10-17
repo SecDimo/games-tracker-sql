@@ -1,8 +1,9 @@
---Create table "Platforms" with columns PlatformID (unique identification #) and PlatformName (console name <50 characters, cannot be empty)
+--Create table "Platforms" 
 CREATE TABLE Platforms (
 PlatformID		INT				Primary Key,
 PlatformName	NVARCHAR(50)	NOT NULL); 
 
+--Create table "Games"
 CREATE TABLE Games(
 GameID			INT				Primary Key,
 Title			NVARCHAR(200)	NOT NULL,
@@ -10,6 +11,7 @@ Developer		NVARCHAR(100)	NOT NULL,
 ReleaseYear		INT				NOT NULL,
 Genre			NVARCHAR(50));
 
+--Create table "OwnedGames"
 CREATE TABLE OwnedGames(
 OwnedID			INT				Primary Key,
 GameID			INT				NOT NULL FOREIGN KEY REFERENCES Games(GameID),
@@ -36,6 +38,7 @@ ReleaseYear     INT             NOT NULL,
 Genre           NVARCHAR(50));
 */
 
+--Data insert into Platform table
 INSERT INTO Platforms (PlatformID, PlatformName) VALUES
 (1, 'PC'),
 (2, 'PS5'),
@@ -52,6 +55,7 @@ INSERT INTO Platforms (PlatformID, PlatformName) VALUES
 (13, 'SNES'),
 (14, 'NES');
 
+--Data insert into Games table
 INSERT INTO Games (GameID, Title, Developer, ReleaseYear, Genre) VALUES
 (1,	'Skyrim',	'Bethesda',	2011,	'RPG'),
 (2,	'Elden Ring',	'FromSoftware',	2022,	'Action RPG'),
@@ -80,8 +84,18 @@ INSERT INTO Games (GameID, Title, Developer, ReleaseYear, Genre) VALUES
 (25, 'Mass Effect 2', 'BioWare', 2010, 'RPG'),
 (26, 'Halo: Combat Evolved', 'Bungie', 2001, 'Shooter'),
 (27, 'Ghost of Tsushima', 'Sucker Punch Productions', 2020, 'Action-Adventure'),
-(28, 'Super Mario Sunshine', 'Nintendo', 2002, 'Platformer');
+(28, 'Super Mario Sunshine', 'Nintendo', 2002, 'Platformer'),
+(29, 'The Legend of Zelda: Breath of the Wild', 'Nintendo', 2017, 'Action-Adventure'),
+(30, 'The Legend of Zelda: Tears of the Kingdom', 'Nintendo', 2023, 'Action-Adventure'),
+(31, 'Super Mario Odyssey', 'Nintendo', 2017, 'Platformer'),
+(32, 'Super Mario Galaxy', 'Nintendo', 2007, 'Platformer'),
+(33, 'Super Mario Bros.', 'Nintendo', 1985, 'Platformer'),
+(34, 'Super Mario World', 'Nintendo', 1990, 'Platformer'),
+(35, 'Super Mario Kart', 'Nintendo', 1992, 'Racing'),
+(36, 'Mario Kart 8 Deluxe', 'Nintendo', 2017, 'Racing'),
+(37, 'Mario Kart Wii', 'Nintendo', 2008, 'Racing');
 
+--Data insert into OwnedGames table
 INSERT INTO OwnedGames(OwnedID, GameID, PlatformID, GameFormat, GameStatus, Rating) VALUES
 (1,  1,  8,  'Physical', 'Completed', 5.0),
 (2,  1,  3,  'Physical', 'Completed', 5.0),
@@ -120,3 +134,9 @@ INSERT INTO OwnedGames(OwnedID, GameID, PlatformID, GameFormat, GameStatus, Rati
 (35, 26, 9,  'Physical', 'Completed', 2.0),
 (36, 28, 10, 'Physical', 'Completed', 0.5),
 (37, 27, 3, 'Physical', 'Completed', 3.5);
+
+--Create new view of joined tables; Joining table o to table g and then joining table o to table p
+ALTER VIEW vw_GameLibrary AS
+SELECT o.GameID, g.Title, p.PlatformName, o.GameFormat, o.GameStatus, o.Rating, g.ReleaseYear, g.Genre, g.Developer FROM OwnedGames o
+Join Games g ON o.GameID = g.GameID
+Join Platforms p ON o.PlatformID = p.PlatformID
