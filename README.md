@@ -25,7 +25,6 @@ I built this to learn SQL from the ground up: designing tables, loading data, wr
 | File | What it does |
 |---|---|
 | `games_tracker.sql` | Creates the tables and loads the data |
-| `views.sql` | Creates the view |
 | `queries.sql` | Practice queries: filtering, grouping, aggregates, HAVING, LEFT JOINs |
 | `procedures.sql` | Stored procedures |
 | `EntityRelationshipDiagram.png` | Entity-relationship diagram |
