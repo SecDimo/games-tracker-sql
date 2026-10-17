@@ -28,7 +28,7 @@ I built this to learn SQL from the ground up: designing tables, loading data, wr
 | `views.sql` | Creates the view |
 | `queries.sql` | Practice queries: filtering, grouping, aggregates, HAVING, LEFT JOINs |
 | `procedures.sql` | Stored procedures |
-| `erd.png` | Entity-relationship diagram |
+| `EntityRelationshipDiagram.png` | Entity-relationship diagram |
  
 **To run it:** `games_tracker.sql` → `views.sql` → `procedures.sql`, then any query in `queries.sql`.
  
