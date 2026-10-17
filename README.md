@@ -1,82 +1,135 @@
-# Game Library Database
+<h1 align="center"> Game Library Database</h1>
+## About
  
-A SQL Server database I built to track the video games I own: which platform each copy is on, whether it's physical or digital, how far I've gotten, and how I'd rate it.
+I built this project to learn SQL from the ground up. It covers designing tables, loading data, writing queries, and building views and stored procedures. The database runs on **Azure SQL Database**, and I wrote the scripts in **VS Code** (mssql extension) and **SSMS**.
  
-I built this to learn SQL from the ground up: designing tables, loading data, writing queries, and creating views and stored procedures. It runs on **Azure SQL Database**, and I wrote the scripts in **VS Code** (mssql extension) and **SSMS**.
+## Contents
+ 
+- [Database Design](#-database-design)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [View](#-view)
+- [Stored Procedures](#%EF%B8%8F-stored-procedures)
+- [Example Queries](#-example-queries)
+- [What I Learned](#-what-i-learned)
+- [Next Steps](#-next-steps)
+
+## Database Design
  
 ![ERD](EntityRelationshipDiagram.png)
  
-## Tables
- 
-| Table | What it holds |
+| Table | Description |
 |---|---|
 | **Games** | One row per game: title, developer, release year, genre |
-| **Platforms** | One row per console/PC (PS5, Switch, Xbox 360, etc.) |
+| **Platforms** | One row per console or PC (PS5, Switch, Xbox 360, …) |
 | **OwnedGames** | One row per copy I own. Links a game to a platform with format, status and rating |
  
-**Relationships:** one game can have many owned copies (for example, Skyrim on three platforms), and one platform can have many games. OwnedGames connects the two with foreign keys.
+**Relationships**
+- One game → many owned copies (for example, Skyrim on three platforms)
+- One platform → many owned copies
+**Data rules (CHECK constraints)**
+- `GameFormat`: `Physical` or `Digital`
+- `GameStatus`: `Unplayed`, `Playing`, `Completed` or `Dropped`
+- `Rating`: 0.5–5.0 in half steps, or `NULL` if not rated yet
+---
  
-**Rules built into the table (CHECK constraints):**
-- `GameFormat` must be Physical or Digital
-- `GameStatus` must be Unplayed, Playing, Completed or Dropped
-- `Rating` must be 0.5–5.0 in half steps, or NULL if not rated yet
-## Files
+## Project Structure
  
-| File | What it does |
-|---|---|
-| `games_tracker.sql` | Creates the tables and loads the data |
-| `queries.sql` | Practice queries: filtering, grouping, aggregates, HAVING, LEFT JOINs |
-| `procedures.sql` | Stored procedures |
-| `EntityRelationshipDiagram.png` | Entity-relationship diagram |
+```
+game-library-sql/
+├── games_tracker.sql   # Creates tables, loads data, and creates vw_GameLibrary
+├── procedures.sql      # Stored procedures
+├── queries.sql         # Practice queries
+├── erd.png             # Entity-relationship diagram
+└── README.md
+```
  
-**To run it:** `games_tracker.sql` → `views.sql` → `procedures.sql`, then any query in `queries.sql`.
+---
+ 
+## Getting Started
+ 
+1. Create a SQL Server or Azure SQL database.
+2. Run the scripts in this order:
+```
+   games_tracker.sql  →  procedures.sql
+```
+3. Run any query from `queries.sql`.
+---
  
 ## View
  
-| View | What it does |
+| View | Description |
 |---|---|
-| `vw_GameLibrary` | Joins OwnedGames, Games and Platforms into one readable list, so queries don't need to repeat the joins |
+| `vw_GameLibrary` | Joins OwnedGames, Games and Platforms into one readable list, so queries don't need to repeat the joins. Created at the bottom of `games_tracker.sql` |
+ 
+---
  
 ## Stored Procedures
  
-| Procedure | Inputs | What it does |
+| Procedure | Parameters | Description |
 |---|---|---|
-| `GetGamesByPlatform` | @Platform | Lists the games I own on that platform |
-| `GetGamesByStatus` | @Status | Lists games by status |
-| `AddOwnedGame` | @GameID, @PlatformID, @GameFormat, @GameStatus, @Rating (optional) | Adds a new owned copy and picks the next OwnedID automatically |
-| `UpdateGameProgress` | @Title, @Platform, @NewStatus, @NewRating (optional) | Updates a game's status/rating. Checks that exactly one copy matches before changing anything |
+| `GetGamesByPlatform` | `@Platform` | Lists the games I own on a platform |
+| `GetGamesByStatus` | `@Status` | Lists games by status |
+| `AddOwnedGame` | `@GameID`, `@PlatformID`, `@GameFormat`, `@GameStatus`, `@Rating`* | Adds a new owned copy and assigns the next OwnedID automatically |
+| `UpdateGameProgress` | `@Title`, `@Platform`, `@NewStatus`, `@NewRating`* | Updates status/rating after checking exactly one copy matches |
+ 
+<sub>* optional</sub>
  
 ```sql
 EXEC GetGamesByPlatform @Platform = 'Switch';
-EXEC UpdateGameProgress @Title = 'Hades', @Platform = 'PC', @NewStatus = 'Completed', @NewRating = 5.0;
+ 
+EXEC UpdateGameProgress
+     @Title = 'Hades', @Platform = 'PC',
+     @NewStatus = 'Completed', @NewRating = 5.0;
 ```
+ 
+---
  
 ## Example Queries
  
+<details>
+<summary><b>Games per platform</b></summary>
 ```sql
--- Games per platform
-SELECT PlatformName, COUNT(*) AS GameCount
-FROM vw_GameLibrary
+SELECT PlatformName, COUNT(GameID) GameCount FROM vw_GameLibrary
 GROUP BY PlatformName
-ORDER BY GameCount DESC;
- 
--- Wishlist: games in the Games table with no owned copy
-SELECT g.Title
-FROM Games g
-LEFT JOIN OwnedGames o ON g.GameID = o.GameID
-WHERE o.OwnedID IS NULL;
+ORDER BY COUNT(GameID) DESC
 ```
+</details>
+<details>
+<summary><b>Wishlist: games with no owned copy (LEFT JOIN)</b></summary>
+```sql
+SELECT Games.GameID, Games.Title FROM Games
+LEFT JOIN OwnedGames ON Games.GameID = OwnedGames.GameID
+WHERE OwnedGames.GameID IS NULL
+```
+</details>
+<details>
+<summary><b>Games I own more than one copy of (HAVING)</b></summary>
+```sql
+SELECT GameID, Title, ReleaseYear, COUNT(GameID) Copies FROM vw_GameLibrary
+GROUP BY GameID, Title, ReleaseYear
+HAVING COUNT(GameID) > 1
+```
+</details>
+<details>
+<summary><b>Average rating, rounded to 2 decimals</b></summary>
+```sql
+SELECT CAST(AVG(Rating) AS DECIMAL(3,2)) AverageRating FROM vw_GameLibrary
+```
+</details>
+---
  
 ## What I Learned
  
 - **Designing tables that relate to each other:** splitting data into separate tables and connecting them with primary and foreign keys, instead of keeping everything in one big table.
 - **Protecting data quality at the database level:** using `NOT NULL` and `CHECK` constraints so bad values can't get in, no matter who's entering the data.
 - **Joins:** combining tables with `INNER JOIN`, and using `LEFT JOIN` to find what's *missing*, like games with no owned copy.
-- **Summarizing data:** `GROUP BY` with `COUNT`, `AVG`, `MIN` and `MAX`, and the difference between filtering rows with `WHERE` and filtering groups with `HAVING`.
+- **Summarizing data:** `GROUP BY` with `COUNT`, `AVG` and `MAX`, and the difference between filtering rows with `WHERE` and filtering groups with `HAVING`.
 - **Views vs stored procedures:** a view is a saved query for reading data, while a stored procedure is saved logic that takes inputs and can change data, the way an app would call it.
 - **Working in the cloud:** setting up and connecting to an Azure SQL database, including firewall rules and authentication.
+---
+ 
 ## Next Steps
  
-- Switch IDs to `IDENTITY` so the database numbers new rows automatically
-- Connect the database to Power BI for a simple dashboard
- 
+- [ ] Switch IDs to `IDENTITY` so new rows are numbered automatically
+- [ ] Connect the database to Power BI for a simple dashboard
