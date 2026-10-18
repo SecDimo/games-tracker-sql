@@ -5,14 +5,14 @@ I built this project to learn SQL from the ground up. It covers designing tables
  
 ## Contents
  
-- [Database Design](#-database-design)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
+- [Database Design](#database-design)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
 - [View](#-view)
-- [Stored Procedures](#%EF%B8%8F-stored-procedures)
-- [Example Queries](#-example-queries)
-- [What I Learned](#-what-i-learned)
-- [Next Steps](#-next-steps)
+- [Stored Procedures](#stored-procedures)
+- [Example Queries](#example-queries)
+- [What I Learned](#what-i-learned)
+- [Next Steps](#next-steps)
 
 ## Database Design
  
