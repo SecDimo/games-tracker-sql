@@ -37,10 +37,10 @@ I built this project to learn SQL from the ground up. It covers designing tables
  
 ```
 game-library-sql/
-├── games_tracker.sql   # Creates tables, loads data, and creates vw_GameLibrary
-├── procedures.sql      # Stored procedures
-├── queries.sql         # Practice queries
-├── erd.png             # Entity-relationship diagram
+├── games_tracker.sql              # Creates tables, loads data, and creates vw_GameLibrary
+├── procedures.sql                 # Stored procedures
+├── queries.sql                    # Practice queries
+├── EntityRelationshipDiagram.png  # Entity-relationship diagram
 └── README.md
 ```
  
@@ -68,16 +68,11 @@ game-library-sql/
  
 | Procedure | Parameters | Description |
 |---|---|---|
-| `GetGamesByPlatform` | `@Platform` | Lists the games I own on a platform |
-| `GetGamesByStatus` | `@Status` | Lists games by status |
-| `AddOwnedGame` | `@GameID`, `@PlatformID`, `@GameFormat`, `@GameStatus`, `@Rating`* | Adds a new owned copy and assigns the next OwnedID automatically |
-| `UpdateGameProgress` | `@Title`, `@Platform`, `@NewStatus`, `@NewRating`* | Updates status/rating after checking exactly one copy matches |
+| `UpdateGameProgress` | `@Title`, `@Platform`, `@NewStatus`, `@NewRating`* | Updates the status/rating of a game I own after checking that exactly one copy matches |
  
 <sub>* optional</sub>
  
 ```sql
-EXEC GetGamesByPlatform @Platform = 'Switch';
- 
 EXEC UpdateGameProgress
      @Title = 'Hades', @Platform = 'PC',
      @NewStatus = 'Completed', @NewRating = 5.0;
@@ -94,6 +89,7 @@ SELECT PlatformName, COUNT(GameID) GameCount FROM vw_GameLibrary
 GROUP BY PlatformName
 ORDER BY COUNT(GameID) DESC
 ```
+ 
 </details>
 <details>
 <summary><b>Wishlist: games with no owned copy (LEFT JOIN)</b></summary>
@@ -102,6 +98,7 @@ SELECT Games.GameID, Games.Title FROM Games
 LEFT JOIN OwnedGames ON Games.GameID = OwnedGames.GameID
 WHERE OwnedGames.GameID IS NULL
 ```
+ 
 </details>
 <details>
 <summary><b>Games I own more than one copy of (HAVING)</b></summary>
@@ -110,12 +107,14 @@ SELECT GameID, Title, ReleaseYear, COUNT(GameID) Copies FROM vw_GameLibrary
 GROUP BY GameID, Title, ReleaseYear
 HAVING COUNT(GameID) > 1
 ```
+ 
 </details>
 <details>
 <summary><b>Average rating, rounded to 2 decimals</b></summary>
 ```sql
 SELECT CAST(AVG(Rating) AS DECIMAL(3,2)) AverageRating FROM vw_GameLibrary
 ```
+ 
 </details>
 ---
  
@@ -127,9 +126,3 @@ SELECT CAST(AVG(Rating) AS DECIMAL(3,2)) AverageRating FROM vw_GameLibrary
 - **Summarizing data:** `GROUP BY` with `COUNT`, `AVG` and `MAX`, and the difference between filtering rows with `WHERE` and filtering groups with `HAVING`.
 - **Views vs stored procedures:** a view is a saved query for reading data, while a stored procedure is saved logic that takes inputs and can change data, the way an app would call it.
 - **Working in the cloud:** setting up and connecting to an Azure SQL database, including firewall rules and authentication.
----
- 
-## Next Steps
- 
-- [ ] Switch IDs to `IDENTITY` so new rows are numbered automatically
-- [ ] Connect the database to Power BI for a simple dashboard
