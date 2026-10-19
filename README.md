@@ -36,7 +36,7 @@ I built this project to learn SQL from the ground up. It covers designing tables
 ## Project Structure
  
 ```
-game-library-sql/
+game-library-sql
 ├── games_tracker.sql              # Creates tables, loads data, and creates vw_GameLibrary
 ├── procedures.sql                 # Stored procedures
 ├── queries.sql                    # Practice queries
